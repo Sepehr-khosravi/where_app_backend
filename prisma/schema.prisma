@@ -1,0 +1,64 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  email     String   @unique
+  createdAt DateTime @default(now())
+
+  lastSeenAt DateTime?
+
+  isVerified Boolean @default(false)
+
+  sentInvites     Invite[] @relation("InviteSender")
+  receivedInvites Invite[] @relation("InviteReceiver")
+
+  relationshipsA Relationship[] @relation("RelationshipUserA")
+  relationshipsB Relationship[] @relation("RelationshipUserB")
+}
+model Invite {
+  id        Int          @id @default(autoincrement())
+  status    InviteStatus @default(PENDING)
+  createdAt DateTime     @default(now())
+
+  senderId   Int         
+  sender     User @relation("InviteSender", fields: [senderId], references: [id])
+
+  receiverId Int         
+  receiver   User @relation("InviteReceiver", fields: [receiverId], references: [id])
+
+  @@unique([senderId, receiverId])
+}
+
+model Relationship {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  userAId Int
+  userA   User @relation("RelationshipUserA", fields: [userAId], references: [id])
+
+  userBId Int
+  userB   User @relation("RelationshipUserB", fields: [userBId], references: [id])
+
+  @@unique([userAId, userBId])
+}
+
