@@ -17,11 +17,11 @@ export interface UserUpdate{
 
 export class UserSearched{
   constructor(
-    readonly id : number,
-    readonly username : string,
-    readonly email : string,
-    isVerified : boolean,
-    inviteStatus : InviteStatus 
+    public readonly id : number,
+    public readonly username : string,
+    public readonly email : string,
+    public isVerified : boolean,
+    public inviteStatus : InviteStatus 
   ){};
 };
 
