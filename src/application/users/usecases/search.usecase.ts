@@ -21,7 +21,7 @@ export class SearchUsersUseCase{
     async execute(dto : SearchUsersQueryDto, userId : number){
         try{
             const users = await this.userRepo.searchUsers(userId, dto);
-            if(!users){
+            if(!users.length){
                 throw new NotFoundException();
             };
 
