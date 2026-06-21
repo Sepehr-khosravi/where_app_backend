@@ -1,9 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { GetUsersQueryDto } from "src/application/users/dto/get-all.dto";
 import { User } from "src/domain/users/entity/user";
-import { IUserRepository, NewUserData, UserUpdate } from "src/domain/users/repository/user.repository.interface";
+import { IUserRepository, NewUserData, UserSearched, UserUpdate } from "src/domain/users/repository/user.repository.interface";
 import { PrismaService } from "src/infrastructure/prisma/prisma.service";
 
+//dto
+import { SearchUsersQueryDto } from "src/application/users/dto/search.dto";
 @Injectable()
 export class UserRepositoryImpl implements IUserRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -96,23 +98,101 @@ export class UserRepositoryImpl implements IUserRepository {
     }
   }
 
-  async findAll(data: GetUsersQueryDto): Promise<User[] | null> {
-    try{
-      const record = await this.prisma.user.findMany({
-        take : data.limit,
-        ...(data.cursor && {
-          cursor : {
-            id : data.cursor
-          },
-          skip : 1
-        })
-      });
+  async findAll(data: GetUsersQueryDto): Promise<User[] | null> 
+  { 
+    try{ 
+      const record = await this.prisma.user.findMany({ 
+        take : data.limit, 
+        ...(data.cursor && { 
+          cursor : { 
+            id : data.cursor 
+          }, skip : 1 
+        }) 
+      }); 
+      return this.toDomainUsersForSearching(record); 
+    } catch(e : any){ 
+      throw new Error(`Failed to get all users by infinit scrolling : ${e.message}`); 
+    } 
+  }
 
-      return this.toDomainUsersForSearching(record);
+  async searchUsers(
+    currentUserId: number,
+    dto: SearchUsersQueryDto,
+  ): Promise<UserSearched[]> {
+    try {
+      const records = await this.prisma.user.findMany({
+        where: {
+          id: {
+            not: currentUserId,
+          },
+          username: {
+            contains: dto.search,
+            mode: "insensitive",
+          },
+        },
+        include: {
+          sentInvites: {
+            where: {
+              receiverId: currentUserId,
+            },
+            select: {
+              status: true,
+            },
+          },
+          receivedInvites: {
+            where: {
+              senderId: currentUserId,
+            },
+            select: {
+              status: true,
+            },
+          },
+        },
+        take: dto.limit,
+        ...(dto.cursor && {
+          cursor: {
+            id: dto.cursor,
+          },
+          skip: 1,
+        }),
+        orderBy: {
+          id: "asc",
+        },
+      });
+  
+      return records ? this.toDomainUsersSearched(records) : [];
+  
+    } catch (e: any) {
+  
+      throw new Error(
+  
+        `Failed to search users: ${e.message}`,
+  
+      );
+  
     }
-    catch(e : any){
-      throw new Error(`Failed to get all users by infinit scrolling : ${e.message}`);
-    }
+  
+  }
+
+  private toDomainUsersSearched(records : any) : UserSearched[]{
+    return records.map((record) => {
+      return this.toDomainUserSearched(record);
+    });
+  }
+
+  private toDomainUserSearched(record : any) : UserSearched{
+    const invite =
+        record.sentInvites[0] ??
+        record.receivedInvites[0];
+
+
+    return new UserSearched(
+        record.id,
+        record.username,
+        record.email,
+        record.isVerified,
+        invite?.status ?? null,
+    );
   }
 
   private toDomainUsersForSearching(record: any): User[] {

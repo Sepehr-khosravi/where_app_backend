@@ -4,18 +4,24 @@ import{
     HttpCode,
     HttpStatus,
     Get,
+    Post,
     Query,
-    UseGuards
+    UseGuards,
+    Body,
+    Req
 } from "@nestjs/common";
 
 //dto
 import { GetUsersQueryDto } from "src/application/users/dto/get-all.dto";
+import { SearchUsersQueryDto } from "src/application/users/dto/search.dto";
 
 //usecases
 import { GetAllUsersUseCase } from "src/application/users/usecases/get-all-usecase";
 
+
 //auth guard
 import { AuthGuard } from "../guards/auth/auth.guard";
+import { SearchUsersUseCase } from "src/application/users/usecases/search.usecase";
 
 
 
@@ -25,6 +31,7 @@ import { AuthGuard } from "../guards/auth/auth.guard";
 export class UserController{
     constructor(
         private readonly getUsersUseCase : GetAllUsersUseCase,
+        private readonly searchUsersUseCase : SearchUsersUseCase
     ){};
 
     
@@ -34,4 +41,13 @@ export class UserController{
     async getUsers(@Query() queries : GetUsersQueryDto){
         return this.getUsersUseCase.execute(queries);
     }
+
+    @Version("1")
+    @HttpCode(HttpStatus.OK)
+    @Post("search")
+    async searchUsers(@Body() dto : SearchUsersQueryDto, @Req() req : any ){
+        return this.searchUsersUseCase.execute(dto, req.user.id);
+    };
+
+    
 };

@@ -6,6 +6,7 @@ import { UserController } from "./users.controller";
 
 //usecases
 import { GetAllUsersUseCase } from "src/application/users/usecases/get-all-usecase";
+import { SearchUsersUseCase } from "src/application/users/usecases/search.usecase";
 import { PrismaService } from "src/infrastructure/prisma/prisma.service";
 
 //providers
@@ -23,6 +24,7 @@ import { AuthGuard } from "../guards/auth/auth.guard";
     providers : [
         AuthGuard,
         GetAllUsersUseCase,
+        SearchUsersUseCase,
         PrismaService,
         {
             provide : "IUserRepository",
