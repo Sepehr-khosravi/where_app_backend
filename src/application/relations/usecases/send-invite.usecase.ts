@@ -26,7 +26,7 @@ export class SendInviteUseCase{
             };
             //creating a new invite:
             const invite = await this.relationRepo.createInvite(dto.senderId, dto.receiverId);
-
+            
             //responsing
             return {
                 message : "ok",

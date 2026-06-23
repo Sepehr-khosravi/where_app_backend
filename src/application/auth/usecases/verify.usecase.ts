@@ -65,6 +65,7 @@ export class VerifyUseCase{
             return {
                 message : "ok",
                 token : token,
+                userId : newUser.id
             }
 
         }

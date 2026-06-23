@@ -8,6 +8,7 @@ import {
     Version,
     HttpStatus,
     UseGuards,
+    Req,
 } from "@nestjs/common";
 
 //dtos
@@ -71,8 +72,11 @@ export class AuthController{
     @Version("1")
     @Get("/check")
     @HttpCode(HttpStatus.OK)
-    async checkToken(){
-        return true;
+    async checkToken(@Req() req : any){
+        return {
+            message : "ok",
+            selfId : req.user.id
+        };
     }
 
 
