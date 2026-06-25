@@ -39,8 +39,17 @@ export class RelationRepositoryImpl implements IRelationRepository {
   async findSentInvites(userId: number): Promise<Invite[]> {
     const records = await this.prisma.invite.findMany({
       where: { senderId: userId },
+      include : {
+        receiver : {
+          select : {
+            id : true,
+            email : true,
+            username : true
+          }
+        }
+      },
     });
-
+    
     return records.map((r) => this.toInviteDomain(r));
   }
 

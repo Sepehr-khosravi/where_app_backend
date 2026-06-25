@@ -18,6 +18,7 @@ import { CancelInviteUseCase } from "src/application/relations/usecases/cancel-i
 import { DeleteRelationUseCase } from "src/application/relations/usecases/delete-relation.usecase";
 import { GetAllRelationsUseCase } from "src/application/relations/usecases/get-all-relations.usecase";
 import { GetInvitesUseCase } from "src/application/relations/usecases/get-invites.usecase";
+import { GetSentInvitesUseCase } from "src/application/relations/usecases/get-sent-invites.usecases";
 import { RejectInviteUseCase } from "src/application/relations/usecases/reject-invite.usecase";
 import { SendInviteUseCase } from "src/application/relations/usecases/send-invite.usecase";
 
@@ -41,8 +42,9 @@ export class RelationController{
         private readonly deleteRelationUseCase : DeleteRelationUseCase,
         private readonly getAllRelationsUseCase : GetAllRelationsUseCase,
         private readonly getInvitesUseCase : GetInvitesUseCase,
+        private readonly getSentInvitesUseCase : GetSentInvitesUseCase,
         private readonly rejectInviteUseCase : RejectInviteUseCase,
-        private readonly sendInviteUseCase : SendInviteUseCase
+        private readonly sendInviteUseCase : SendInviteUseCase,
     ){};
 
     @Version("1")
@@ -79,6 +81,13 @@ export class RelationController{
     async getInvites(@Req() req : any){
         return this.getInvitesUseCase.execute(req.user.id);
     };
+
+    @Version("1")
+    @HttpCode(HttpStatus.OK)
+    @Get("invites/sent")
+    async getSentInvites(@Req() req : any){
+        return this.getSentInvitesUseCase.execute(req.user.id);
+    }
 
     @Version("1")
     @HttpCode(HttpStatus.OK)

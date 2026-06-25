@@ -8,7 +8,7 @@ export class Invite {
     public readonly receiverId: number,
     public status: InviteStatus,
     public readonly createdAt: Date,
-    public readonly sender : InviteSender | null
+    public readonly friend : InviteSender | null
   ) {}
 
   static create(senderId: number, receiverId: number, sender : InviteSender | null): Invite {

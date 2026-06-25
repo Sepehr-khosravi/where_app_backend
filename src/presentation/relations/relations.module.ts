@@ -11,6 +11,7 @@ import { CancelInviteUseCase } from "src/application/relations/usecases/cancel-i
 import { DeleteRelationUseCase } from "src/application/relations/usecases/delete-relation.usecase";
 import { GetAllRelationsUseCase } from "src/application/relations/usecases/get-all-relations.usecase";
 import { GetInvitesUseCase } from "src/application/relations/usecases/get-invites.usecase";
+import { GetSentInvitesUseCase } from "src/application/relations/usecases/get-sent-invites.usecases";
 import { RejectInviteUseCase } from "src/application/relations/usecases/reject-invite.usecase";
 import { SendInviteUseCase } from "src/application/relations/usecases/send-invite.usecase";
 //providers
@@ -42,6 +43,7 @@ import { JwtModule } from "@nestjs/jwt";
         GetInvitesUseCase,
         RejectInviteUseCase,
         SendInviteUseCase,
+        GetSentInvitesUseCase,
         {
             provide : "IRelationRepository",
             useClass : RelationRepositoryImpl
