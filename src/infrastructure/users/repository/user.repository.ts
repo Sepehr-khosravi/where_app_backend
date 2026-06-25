@@ -21,7 +21,14 @@ export class UserRepositoryImpl implements IUserRepository {
 
   async findById(id: number): Promise<User | null> {
     try {
-      const record = await this.prisma.user.findUnique({ where: { id } });
+      const record = await this.prisma.user.findUnique({
+         where: { id } ,
+         select : {
+          email : true,
+          username : true,
+          id : true
+         }
+      });
       return record ? this.toDomain(record) : null;
     } catch (e: any) {
       throw new Error(`Failed to find user by id: ${e.message}`);

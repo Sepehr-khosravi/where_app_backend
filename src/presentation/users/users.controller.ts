@@ -13,6 +13,7 @@ import{
 
 //dto
 import { GetUsersQueryDto } from "src/application/users/dto/get-all.dto";
+import { GetSelfUserUseCase } from "src/application/users/usecases/get-self-user.usecase";
 import { SearchUsersQueryDto } from "src/application/users/dto/search.dto";
 
 //usecases
@@ -31,7 +32,8 @@ import { SearchUsersUseCase } from "src/application/users/usecases/search.usecas
 export class UserController{
     constructor(
         private readonly getUsersUseCase : GetAllUsersUseCase,
-        private readonly searchUsersUseCase : SearchUsersUseCase
+        private readonly searchUsersUseCase : SearchUsersUseCase,
+        private readonly getSelfUserUseCase : GetSelfUserUseCase
     ){};
 
     
@@ -44,10 +46,18 @@ export class UserController{
 
     @Version("1")
     @HttpCode(HttpStatus.OK)
+    @Get("self")
+    async getSelfUserProfile(@Req() req : any){
+        return this.getSelfUserUseCase.execute(req.user.id);
+    }
+
+    @Version("1")
+    @HttpCode(HttpStatus.OK)
     @Post("search")
     async searchUsers(@Body() dto : SearchUsersQueryDto, @Req() req : any ){
         return this.searchUsersUseCase.execute(dto, req.user.id);
     };
-
     
+
+
 };
