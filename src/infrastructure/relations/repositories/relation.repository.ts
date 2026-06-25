@@ -49,8 +49,8 @@ export class RelationRepositoryImpl implements IRelationRepository {
         }
       },
     });
-    
-    return records.map((r) => this.toInviteDomain(r));
+
+    return records.map((r) => this.toSentInviteDomain(r));
   }
 
   async findReceivedInvites(userId: number): Promise<Invite[] > {
@@ -292,6 +292,17 @@ export class RelationRepositoryImpl implements IRelationRepository {
   }
 
   // MAPPERS
+
+  private toSentInviteDomain(record : any) : Invite{
+    return new Invite(
+      record.id,
+      record.senderId,
+      record.receiverId,
+      record.status,
+      record.createdAt,
+      record.receiver ? record.receiver : null
+    )
+  }
 
   private toInviteDomain(record: any): Invite {
     return new Invite(
