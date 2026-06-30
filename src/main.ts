@@ -19,6 +19,10 @@ async function bootstrap() {
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
 
+  //enabling trust proxy for proxy and revers proxy in nginx
+  const express = app.getHttpAdapter().getInstance();
+  express.set('trust proxy', true);
+
   await app.listen(configuration.PORT || 8080);
 }
 bootstrap();
