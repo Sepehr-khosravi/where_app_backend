@@ -32,6 +32,7 @@ import type {
     LocationUpdatePayload,
     WatchFriendPayload,
 } from "./types";
+import { GetFriendLastLocationUseCase } from "src/application/location/usecases/get-friend-last-location.usecase";
 
 @WebSocketGateway({
     cors: {
@@ -52,6 +53,9 @@ export class SocketGateway {
 
         private readonly watchFriendUseCase:
             WatchFriendUseCase,
+
+        private readonly getFriendLastLocationUseCase : 
+            GetFriendLastLocationUseCase
     ) {}
 
     async handleConnection(
@@ -130,15 +134,36 @@ export class SocketGateway {
         const userId =
             client.data.userId;
 
-        await this.watchFriendUseCase.execute(
+        const isRelated = await this.watchFriendUseCase.execute(
             userId,
             data.friendId,
         );
+        if(!isRelated) return {
+            message : "access denied"
+        };
 
         client.join(
             `watch_friend_${data.friendId}`,
         );
 
+        const lastLocation = await this.getFriendLastLocationUseCase.execute(data.friendId);
+        
+        this.server
+        .to(
+            `watch_friend_${data.friendId}`,
+        ).emit(
+            SOCKET_EVENTS.FRIEND_LOCATION,
+            {
+                userId : data.friendId,
+                latitude:
+                    lastLocation.latitude,
+                longitude:
+                    lastLocation.longitude,
+                updatedAt:
+                    lastLocation.updatedAt,
+            }
+        );
+        
         return {
             success: true,
         };

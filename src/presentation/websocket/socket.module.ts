@@ -5,6 +5,7 @@ import { SocketService } from "./socket.service";
 import { UpdateLocationUseCase } from "src/application/location/usecases/update-location.usecase";
 import { WatchFriendUseCase } from "src/application/location/usecases/watch-friend.usecase";
 import { UnwatchFriendUseCase } from "src/application/location/usecases/unwatch-friend.usecase";
+import { GetFriendLastLocationUseCase } from "src/application/location/usecases/get-friend-last-location.usecase";
 import { RelationRepositoryImpl } from "../../infrastructure/relations/repositories/relation.repository";
 import { TokenGeneratorService } from "../../infrastructure/auth/services/token-generator.service";
 import { LocationRepositoryImpl } from "src/infrastructure/location/repositories/location.repository";
@@ -20,6 +21,7 @@ import { PrismaModule } from "src/infrastructure/prisma/prisma.module";
         SocketService,
         UpdateLocationUseCase,
         WatchFriendUseCase,
+        GetFriendLastLocationUseCase,
         UnwatchFriendUseCase,
         RedisService,
         JwtService,
