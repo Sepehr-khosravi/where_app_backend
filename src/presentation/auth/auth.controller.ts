@@ -11,6 +11,9 @@ import {
     Req,
 } from "@nestjs/common";
 
+//for making rate limitation
+import { Throttle } from "@nestjs/throttler";
+
 //dtos
 import { RegisterDto } from "src/application/auth/dto/register.dto";
 import { LoginDto } from "src/application/auth/dto/login.dto";
@@ -37,6 +40,10 @@ export class AuthController{
     ){};
 
     @Version("1")
+    @Throttle({
+        default : { limit : 3, ttl : 300000}
+    })
+    // @Throttle()
     @Post("register")
     @HttpCode(HttpStatus.CREATED)
     async register(@Body() dto : RegisterDto){
@@ -45,6 +52,12 @@ export class AuthController{
 
 
     @Version("1")
+    @Throttle({
+        default : {
+            limit : 3,
+            ttl : 60000
+        }
+    })
     @Post("verify-email")
     @HttpCode(HttpStatus.OK)
     async emailOtp(@Body() dto : VerificationDto){
@@ -53,6 +66,12 @@ export class AuthController{
 
 
     @Version("1")
+    @Throttle({
+        default : {
+            limit : 3,
+            ttl : 30000
+        }
+    })
     @Post("login")
     @HttpCode(HttpStatus.OK)
     async login(@Body() dto : LoginDto){
@@ -61,6 +80,12 @@ export class AuthController{
 
 
     @Version("1")
+    @Throttle({
+        default  : {
+            limit : 1,
+            ttl : 300000
+        }
+    })
     @Post("resend-code")
     @HttpCode(HttpStatus.OK)
     async resendCode(@Body() dto : ResendVerificationCodeDto){
@@ -71,6 +96,12 @@ export class AuthController{
     @UseGuards(AuthGuard)
     @Version("1")
     @Get("/check")
+    @Throttle({
+        default : {
+            limit : 20,
+            ttl : 60000
+        }
+    })
     @HttpCode(HttpStatus.OK)
     async checkToken(@Req() req : any){
         return {

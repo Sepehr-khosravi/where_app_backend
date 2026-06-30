@@ -6,6 +6,8 @@ import { AuthModule } from './presentation/auth/auth.module';
 import { UserModule } from './presentation/users/users.module';
 import { RelationModule } from './presentation/relations/relations.module';
 import { SocketModule } from './presentation/websocket/socket.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 
 @Module({
@@ -17,7 +19,40 @@ import { SocketModule } from './presentation/websocket/socket.module';
     AuthModule,
     UserModule,
     RelationModule,
-    SocketModule
+    SocketModule,
+    //rate limiting
+    // ThrottlerModule.forRoot(
+      // [
+      // {
+      //   name : "short",
+      //   ttl : 1000,
+      //   limit : 3,
+      // },
+      // {
+      //   name : "medium",
+      //   ttl : 10000,
+      //   limit : 20
+      // },
+      // {
+      //   name : "long",
+      //   ttl : 60000,
+      //   limit : 100
+      // }
+      // ]
+    // )
+    ThrottlerModule.forRoot([
+      {
+        name : 'default',
+        ttl : 10000,
+        limit : 20
+      }
+    ])
   ],
+  providers : [
+    {
+      provide : APP_GUARD,
+      useClass : ThrottlerGuard
+    }
+  ]
 })
 export class AppModule {}
